@@ -1,6 +1,6 @@
-class AppViewModel {
+class AppViewModel extends ViewModel {
   constructor(model) {
-    this.model = model
+    super(model)
     
     this.__toggle = this.__toggle.bind(this)
     this.__toggleAll = this.__toggleAll.bind(this)
@@ -20,6 +20,8 @@ class AppViewModel {
     Object.keys(model).forEach(key => {
       model[key].register((val) => this.update(key, val))
     })
+
+    this.render()
   }
 
   __toggleAll(e) {
@@ -62,15 +64,17 @@ class AppViewModel {
   }
 
   update(key, val) {
+    const model = this.model
+    const viewModel = this.viewModel
+
     switch(key) {
       case 'onlyDone':
-        this.viewModel.flags.set(0, { ...this.viewModel.flags.value[0], onlyDone: this.model.onlyDone.value})
       case 'items':
-        this.viewModel.items.value = this.__prepareItems()
-        this.viewModel.flags.set(0, { ...this.viewModel.flags.value[0], toggledAll: this.__toggledAll()})
+        viewModel.items.value = this.__prepareItems()
+        viewModel.flags.set(0, { ...viewModel.flags.value[0], onlyDone: model.onlyDone.value, toggledAll: this.__toggledAll()})
         break
       case 'orderBy':
-        this.viewModel.items.sort(this.__sortBy(val))
+        viewModel.items.sort(this.__sortBy(val))
         break
     }
   }
@@ -84,8 +88,6 @@ const model = createModel({
 })
 
 const viewModel = new AppViewModel(model)
-
-bindViewModelToTemplates(viewModel.viewModel);
 
 utils.$('#add-task').addEventListener('submit', e => {
   e.preventDefault()

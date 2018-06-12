@@ -264,6 +264,25 @@ class ObservableValue extends Observable {
   }
 }
 
+class ViewModel {
+  constructor(model) {
+    this.model = model
+  }
+
+  render() {
+    utils.$$('template[data-bind]').forEach(template => {
+      const tmpl = new HyperTemplate(template)
+      const key = template.getAttribute('data-bind')
+      if (key in this.viewModel) {
+        this.viewModel[key].register(data => {
+          tmpl.render(data)
+        })
+        tmpl.render(this.viewModel[key].value)
+      }
+    })
+  }
+}
+
 const createModel = obj => {
   const newObj = {}
   Object.keys(obj).forEach(key => {
@@ -276,19 +295,6 @@ const createModel = obj => {
     }
   })
   return newObj
-}
-
-function bindViewModelToTemplates(viewModel) {
-  utils.$$('template[data-bind]').forEach(template => {
-    const tmpl = new HyperTemplate(template)
-    const key = template.getAttribute('data-bind')
-    if (key in viewModel) {
-      viewModel[key].register(data => {
-        tmpl.render(data)
-      })
-      tmpl.render(viewModel[key].value)
-    }
-  })
 }
 
 
