@@ -7,38 +7,34 @@
   <link rel="stylesheet" href="custom.css"/>
 </head>
 <body>
+<h1>HyperTemplates TodoMVC</h1>
+
+<form id="add-task">
+  <input name="task">
+  <input type="submit" value="+">
+</form>
 
 <table>
-  <tr>
-    <th></th>
-    <th>UID</th>
-    <th>Task</th>
-    <th>Done</th>
-  </tr>
   <template data-bind="items">
     <tr>
-      <td><button data-key="{{id}}" onclick="{{delete}}">x</button></td>
-      <td>{{id}}</td>
-      <td>{{task}}</td>
       <td><input type="checkbox" checked="{{done}}" data-key="{{id}}" onchange="{{toggle}}"></td>
+      <td>{{task}}</td>
+      <td><button data-key="{{id}}" onclick="{{delete}}">x</button></td>
     </tr>
   </template>
 </table>
 
-<form id="add-task">
-  <input name="task">
-  <input type="submit">
-</form>
+<footer>
+  <template data-bind="flags">
+    <input type="checkbox" checked="{{onlyDone}}" id="toggle-done" onchange="{{onFilterDone}}">
+  </template>
+  <label for="toggle-done">Filter done</label><br>
 
-<template data-bind="flags">
-  <input type="checkbox" checked="{{onlyDone}}" id="toggle-done">
-</template>
-<label for="toggle-done">Filter done</label>
-<br>
-<template data-bind="flags">
-  <input type="checkbox" id="toggle-all" checked="{{toggledAll}}">
-</template>
-<label for="toggle-all">Toggle all</label>
+  <template data-bind="flags">
+    <input type="checkbox" id="toggle-all" checked="{{toggledAll}}" onchange="{{onToggleAll}}">
+  </template>
+  <label for="toggle-all">Toggle all</label>
+</footer>
 <!-- scripts -->
 <script src="script.js"></script>
 </body>

@@ -283,7 +283,9 @@ function bindViewModelToTemplates(viewModel) {
     const tmpl = new HyperTemplate(template)
     const key = template.getAttribute('data-bind')
     if (key in viewModel) {
-      viewModel[key].register(data => tmpl.render(data))
+      viewModel[key].register(data => {
+        tmpl.render(data)
+      })
       tmpl.render(viewModel[key].value)
     }
   })
@@ -294,18 +296,41 @@ function bindViewModelToTemplates(viewModel) {
 class AppVM {
   constructor(model) {
     this.model = model
+    
+    this.__toggle = this.__toggle.bind(this)
+    this.__toggleAll = this.__toggleAll.bind(this)
+    this.__filterDone = this.__filterDone.bind(this)
+    this.__deleteItem = this.__deleteItem.bind(this)
+
     this.viewModel = {
       items: new ObservableArray(this.__prepareItems()),
       flags: new ObservableArray([{
           onlyDone: this.model.onlyDone.value,
-          toggledAll: false
+          toggledAll: this.__toggledAll(),
+          onToggleAll: this.__toggleAll,
+          onFilterDone: this.__filterDone
         }])
     }
     Object.keys(model).forEach(key => {
       model[key].register((val) => this.update(key, val))
     })
-    this.__toggle = this.__toggle.bind(this)
-    this.__deleteItem = this.__deleteItem.bind(this)
+  }
+
+  __toggleAll(e) {
+    const items = this.model.items.value
+    Object.keys(items).forEach(key => {
+      items[key] = {...items[key], done: e.target.checked}
+    })
+  }
+
+  __filterDone(e) {
+    this.model.onlyDone.value = e.target.checked
+  }
+
+  __toggledAll() {
+    const items = this.model.items.value
+    const keys = Object.keys(items)
+    return keys.length && !keys.filter(key => !items[key].done).length ? true : false
   }
 
   __deleteItem(e) {
@@ -331,9 +356,10 @@ class AppVM {
   update(key, val) {
     switch(key) {
       case 'onlyDone':
-        this.viewModel.flags[0] = { ...this.viewModel.flags[0], onlyDone: this.model.onlyDone.value}
+        this.viewModel.flags.set(0, { ...this.viewModel.flags.value[0], onlyDone: this.model.onlyDone.value})
       case 'items':
         this.viewModel.items.value = this.__prepareItems()
+        this.viewModel.flags.set(0, { ...this.viewModel.flags.value[0], toggledAll: this.__toggledAll()})
         break
       case 'orderBy':
         this.viewModel.items.sort(this.__sortBy(val))
@@ -355,20 +381,12 @@ bindViewModelToTemplates(viewModel.viewModel);
 
 utils.$('#add-task').addEventListener('submit', e => {
   e.preventDefault()
+  if (e.target.task.value === '')
+    return false
   const UID = model.nextUID.value
   model.items.value[UID] = {task: e.target.task.value, done: false}
   model.nextUID.value = UID + 1;
   e.target.reset()
-})
-
-utils.$('#toggle-done').addEventListener('change', e => {
-  model.onlyDone.value = e.target.checked
-})
-
-utils.$('#toggle-all').addEventListener('change', e => {
-  Object.keys(model.items.value).forEach(key => {
-    model.items.value[key] = {...model.items.value[key], done: e.target.checked}
-  })
 })
 
 
