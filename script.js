@@ -41,11 +41,33 @@ const utils = {
       return arr.indexOf(res[0])
 
     return -1
+  },
+
+  objToArr(obj, keyAs, extend) {
+    const res = []
+    Object.keys(obj).forEach(key => {
+      res.push({[keyAs]: key, ...obj[key], ...extend})
+    })
+    return res
   }
 }
 
 class HyperTemplate {
   constructor(dom) {
+    this.EVENTS = {
+      onchange: 'change',
+      onblur: 'blur',
+      onmouseover: 'mouseover',
+      onmouseout: 'mouseout',
+      onmousedown: 'mousedown',
+      onmouseup: 'mouseup',
+      onclick: 'click',
+      onkeydown: 'keydown'
+    }
+    this.VALUELESS_ATTRS = {
+      checked: null,
+      selected: null
+    }
     this.dom = dom
     this.data = []
     this.hash = []
@@ -65,7 +87,14 @@ class HyperTemplate {
             let match = attr.textContent.match(/{{([^{}]+)}}/);
             if (match) {
               let key = match[1]
-              c[key] ? c[key].push(attr) : c[key] = [attr]
+              if (attr.name in this.EVENTS) {
+                e.removeAttribute(attr.name)
+                const evHandler = {nodeValue: () => {}}
+                e.addEventListener(this.EVENTS[attr.name], e => evHandler.nodeValue(e))
+                c[key] ? c[key].push(evHandler) : c[key] = [evHandler]
+              } else {
+                c[key] ? c[key].push(attr) : c[key] = [attr]
+              }
             }
           }
         }
@@ -105,9 +134,13 @@ class HyperTemplate {
     const hash = this.__parsePlaceholders(frag)
 
     for (let key in hash) {
-      hash[key].forEach(node =>
-        node.nodeValue = data[key]
-      )
+      hash[key].forEach(node => {
+        if (node.nodeType === Node.ATTRIBUTE_NODE && node.name in this.VALUELESS_ATTRS) {
+          data[key] ? node.nodeValue = data[key] : node.ownerElement.removeAttribute(node.name)
+        } else {
+          node.nodeValue = data[key]
+        }
+      })
     }
     this.hash.splice(i, 0, { ...hash, __DOMNode: frag.firstChild })
     if (!this.tlength)
@@ -262,25 +295,28 @@ class AppVM {
   constructor(model) {
     this.model = model
     this.viewModel = {
-      items: new ObservableArray(this.__prepareItems())
+      items: new ObservableArray(this.__prepareItems()),
+      flags: new ObservableArray([{
+          onlyDone: this.model.onlyDone.value,
+          toggledAll: false
+        }])
     }
     Object.keys(model).forEach(key => {
       model[key].register((val) => this.update(key, val))
     })
+    this.__toggle = this.__toggle.bind(this)
+  }
+
+  __toggle(e) {
+    const items = this.model.items.value,
+      key = e.target.getAttribute('data-key')
+    items[key] = {...items[key], done: !items[key].done}
   }
 
   __prepareItems() {
-    return this.__objToArr(this.model.items.value)
+    return utils.objToArr(this.model.items.value, 'id', {toggle: this.__toggle})
       .sort(this.__sortBy(this.model.orderBy.value))
       .filter(i => this.model.onlyDone.value ? i.done : i)
-  }
-
-  __objToArr(obj) {
-    const res = []
-    Object.keys(obj).forEach(key => {
-      res.push({id: key, ...obj[key]})
-    })
-    return res
   }
 
   __sortBy(key) {
@@ -289,8 +325,9 @@ class AppVM {
 
   update(key, val) {
     switch(key) {
-      case 'items':
       case 'onlyDone':
+        this.viewModel.flags[0] = { ...this.viewModel.flags[0], onlyDone: this.model.onlyDone.value}
+      case 'items':
         this.viewModel.items.value = this.__prepareItems()
         break
       case 'orderBy':
@@ -301,21 +338,33 @@ class AppVM {
 }
 
 const model = createModel({
-  nextUID: 4,
+  nextUID: 0,
   orderBy: 'id',
   onlyDone: false,
-  items: {
-    1: {task: 'ahoj3', done: false},
-    2: {task: 'ahoj1', done: false},
-    3: {task: 'ahoj2', done: false}
-  }
+  items: {}
 })
 
 const viewModel = new AppVM(model)
 
 bindViewModelToTemplates(viewModel.viewModel);
 
-model.items.value[2] = {task: 'jak se mas?', done: true}
-model.items.value[3] = {...model.items.value[3], done: true}
-model.items.value[4] = {task: 'ahoj?', done: false}
-model.onlyDone.value = false
+utils.$('#add-task').addEventListener('submit', e => {
+  e.preventDefault()
+  const UID = model.nextUID.value
+  model.items.value[UID] = {task: e.target.task.value, done: false}
+  model.nextUID.value = UID + 1;
+  e.target.reset()
+})
+
+utils.$('#toggle-done').addEventListener('change', e => {
+  model.onlyDone.value = e.target.checked
+})
+
+utils.$('#toggle-all').addEventListener('change', e => {
+  Object.keys(model.items.value).forEach(key => {
+    model.items.value[key] = {...model.items.value[key], done: e.target.checked}
+  })
+})
+
+
+
