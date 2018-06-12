@@ -1,68 +1,22 @@
 <!doctype html>
 <html>
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.1/css/bootstrap-reboot.min.css" crossorigin="anonymous"/>
-    <link rel="stylesheet" href="custom.css"/>
-  </head>
-  <body>
-    <ul>
-      <template data-bind="accounts">
-        <li data-each="{{.}}">{{name}}</li>
-      </template>
-    </ul>
-    <form id="add-acc">
-      <input type="text" name="account" placeholder="account">
-      <input type="submit" value="+">
-    </form>
-    <form id="add-tx">
-      <fieldset>
-        <legend>Add tx</legend>
-        <input type="date" name="date" id="add-tx-date">
-        <input type="hidden" value="income" name="from">
-        <select name="to">
-          <option value="" selected disabled hidden>Account...</option>
-          <template data-bind="accounts">
-            <option>{{name}}</option>
-          </template>
-        </select>
-        <input type="number" min="0" placeholder="0" value="0" name="ammount">
-        <input type="text" placeholder="desc" name="desc">
-        <input type="submit">
-      </fieldset>
-    </form>
-    <table class="book">
-      <caption>Income</caption>
-      <thead>
-        <tr>
-          <th></th>
-          <th>#</th>
-          <th>Desc</th>
-          <th>Date</th>
-          <th>To</th>
-          <th>Decrease</th>
-          <th>Increase</th>
-          <th>Balance</th>
-        </tr>
-      </thead>
-      <tbody id="tbody">
-        <template data-bind="data">
-          <tr>
-            <td><button class="delete" data-click="deleteTx" data-key="{{_key}}">&nbsp;x&nbsp;</button></td>
-            <td>{{id}}</td>
-            <td>{{desc}}</td>
-            <td>{{date}}</td>
-            <td>{{to}}</td>
-            <td>{{decrease}}</td>
-            <td>{{increase}}</td>
-            <td>{{balance}}</td>
-          </tr>
-        </template>
-      </tbody>
-    </table>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.1/css/bootstrap-reboot.min.css" crossorigin="anonymous"/>
+  <link rel="stylesheet" href="custom.css"/>
+</head>
+<body>
 
-    
-    <script src="script.js"></script>
-  </body>
+
+<template id="test">
+  {{id}}
+  <div data-key="{{item1}}">
+    {{item1}}
+  </div>
+</template>
+
+<!-- scripts -->
+<script src="script.js"></script>
+</body>
 </html>
