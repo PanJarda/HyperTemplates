@@ -17,10 +17,10 @@
   </tr>
   <template data-bind="items">
     <tr>
-      <td><input type="checkbox" checked="{{done}}" data-key="{{id}}" onchange="{{toggle}}"></td>
+      <td><button data-key="{{id}}" onclick="{{delete}}">x</button></td>
       <td>{{id}}</td>
       <td>{{task}}</td>
-      <td>{{done}}</td>
+      <td><input type="checkbox" checked="{{done}}" data-key="{{id}}" onchange="{{toggle}}"></td>
     </tr>
   </template>
 </table>

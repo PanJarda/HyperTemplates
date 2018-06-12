@@ -305,6 +305,11 @@ class AppVM {
       model[key].register((val) => this.update(key, val))
     })
     this.__toggle = this.__toggle.bind(this)
+    this.__deleteItem = this.__deleteItem.bind(this)
+  }
+
+  __deleteItem(e) {
+    delete this.model.items.value[e.target.getAttribute('data-key')]
   }
 
   __toggle(e) {
@@ -314,7 +319,7 @@ class AppVM {
   }
 
   __prepareItems() {
-    return utils.objToArr(this.model.items.value, 'id', {toggle: this.__toggle})
+    return utils.objToArr(this.model.items.value, 'id', {toggle: this.__toggle, delete: this.__deleteItem})
       .sort(this.__sortBy(this.model.orderBy.value))
       .filter(i => this.model.onlyDone.value ? i.done : i)
   }
