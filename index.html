@@ -8,13 +8,15 @@
 </head>
 <body>
 
-
-<template id="test">
-  {{id}}
-  <div data-key="{{item1}}">
-    {{item1}}
-  </div>
-</template>
+<table>
+  <template data-bind="items">
+    <tr>
+      <td>{{id}}</td>
+      <td>{{task}}</td>
+      <td>{{done}}</td>
+    </tr>
+  </template>
+</table>
 
 <!-- scripts -->
 <script src="script.js"></script>

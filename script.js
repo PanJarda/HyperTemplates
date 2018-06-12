@@ -153,6 +153,11 @@ class ObservableArray extends Observable {
     this.__value = arr ? [ ...arr ] : []
   }
 
+  set(index, value) {
+    this.__value[index] = value
+    this.notify()
+  }
+
   get value() {
     return this.__value
   }
@@ -184,39 +189,133 @@ class ObservableArray extends Observable {
 class ObservableObject extends Observable {
   constructor(obj) {
     super()
-    this.__value = { ...obj }
+    const self = this
+    this.__handler = {
+      set(target, key, value) {
+        target[key] = value
+        self.notify()
+        return true
+      },
+      deleteProperty(target, key) {
+        delete target[key]
+        self.notify()
+        return true
+      }
+    }
+    this.__value = new Proxy(obj ? { ...obj } : {}, this.__handler)
   }
 
-  set(key, val) {
-    this.__value[key] = val
-    this.notify()
+  get value() {
+    return this.__value
   }
 
-  get(key) {
-    return this.__value[key]
-  }
-
-  delete(key) {
-    delete this.__value[key]
+  set value(val) {
+    this.__value = new Proxy(val, this.__handler)
     this.notify()
   }
 }
 
-const tmpl = new HyperTemplate(utils.$('#test'))
-const model = new ObservableArray()
-model.register(val => tmpl.render(val))
+class ObservableValue extends Observable {
+  constructor(val) {
+    super()
+    this.__value = val
+  }
 
-model.value = [
-  {id: 1, item1: 'ahoj'},
-  {id: 2, item1: 'ahoj2'},
-  {id: 3, item1: 'ahoj3'}
-]
+  set value(val) {
+    this.__value = val
+    this.notify()
+  }
 
-model.sort((a, b) => a.id < b.id)
+  get value() {
+    return this.__value
+  }
+}
 
-/*
-const t = utils.$('#test')
-utils.walkNodes(t.content, (e) =>{
-  console.log(e)
+const createModel = obj => {
+  const newObj = {}
+  Object.keys(obj).forEach(key => {
+    if (Array.isArray(obj[key])){
+      newObj[key] = new ObservableArray(obj[key])
+    } else if (typeof obj[key] === 'object') {
+      newObj[key] = new ObservableObject(obj[key])
+    } else {
+      newObj[key] = new ObservableValue(obj[key])
+    }
+  })
+  return newObj
+}
+
+function bindViewModelToTemplates(viewModel) {
+  utils.$$('template[data-bind]').forEach(template => {
+    const tmpl = new HyperTemplate(template)
+    const key = template.getAttribute('data-bind')
+    if (key in viewModel) {
+      viewModel[key].register(data => tmpl.render(data))
+      tmpl.render(viewModel[key].value)
+    }
+  })
+}
+
+/* App */
+
+class AppVM {
+  constructor(model) {
+    this.model = model
+    this.viewModel = {
+      items: new ObservableArray(this.__prepareItems())
+    }
+    Object.keys(model).forEach(key => {
+      model[key].register((val) => this.update(key, val))
+    })
+  }
+
+  __prepareItems() {
+    return this.__objToArr(this.model.items.value)
+      .sort(this.__sortBy(this.model.orderBy.value))
+      .filter(i => this.model.onlyDone.value ? i.done : i)
+  }
+
+  __objToArr(obj) {
+    const res = []
+    Object.keys(obj).forEach(key => {
+      res.push({id: key, ...obj[key]})
+    })
+    return res
+  }
+
+  __sortBy(key) {
+    return (a, b) => a[key] > b[key]
+  }
+
+  update(key, val) {
+    switch(key) {
+      case 'items':
+      case 'onlyDone':
+        this.viewModel.items.value = this.__prepareItems()
+        break
+      case 'orderBy':
+        this.viewModel.items.sort(this.__sortBy(val))
+        break
+    }
+  }
+}
+
+const model = createModel({
+  nextUID: 4,
+  orderBy: 'id',
+  onlyDone: false,
+  items: {
+    1: {task: 'ahoj3', done: false},
+    2: {task: 'ahoj1', done: false},
+    3: {task: 'ahoj2', done: false}
+  }
 })
-*/
+
+const viewModel = new AppVM(model)
+
+bindViewModelToTemplates(viewModel.viewModel);
+
+model.items.value[2] = {task: 'jak se mas?', done: true}
+model.items.value[3] = {...model.items.value[3], done: true}
+model.items.value[4] = {task: 'ahoj?', done: false}
+model.onlyDone.value = false
