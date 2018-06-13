@@ -5,7 +5,11 @@ class AppViewModel extends ViewModel {
     this.__toggle = this.__toggle.bind(this)
     this.__toggleAll = this.__toggleAll.bind(this)
     this.__filterDone = this.__filterDone.bind(this)
+    this.__editItem = this.__editItem.bind(this)
+    this.__endEditItem = this.__endEditItem.bind(this)
     this.__deleteItem = this.__deleteItem.bind(this)
+
+    this.edited = false
 
     this.viewModel = {
       items: new ObservableArray(this.__prepareItems()),
@@ -18,7 +22,7 @@ class AppViewModel extends ViewModel {
     }
 
     Object.keys(model).forEach(key => {
-      model[key].register((val) => this.update(key, val))
+      model[key].register(val => this.update(key, val))
     })
 
     this.render()
@@ -41,6 +45,33 @@ class AppViewModel extends ViewModel {
     return keys.length && !keys.filter(key => !items[key].done).length ? true : false
   }
 
+  __editItem(e) {
+    const key = e.target.getAttribute('data-key')
+    const items = this.model.items
+    items.value[key] = {...items.value[key], isEditMode: true, isNotEditMode: false}
+  }
+
+  __endEditItem(e) {
+    const key = e.target.getAttribute('data-key')
+    const items = this.model.items
+    if (e instanceof KeyboardEvent) {
+      switch(e.which) {
+        case 27:
+          this.edited = true
+          items.value[key] = {...items.value[key], isEditMode: false, isNotEditMode: true}
+          break
+        case 13:
+          this.edited = true
+          items.value[key] = {...items.value[key], task: e.target.value, isEditMode: false, isNotEditMode: true}
+          break
+      }
+      this.edited = false
+    } else if (!this.edited) {
+      this.edited = false
+      items.value[key] = {...items.value[key], task: e.target.value, isEditMode: false, isNotEditMode: true}
+    }
+  }
+
   __deleteItem(e) {
     const key = e.target.getAttribute('data-key')
     const model = this.model
@@ -54,7 +85,12 @@ class AppViewModel extends ViewModel {
   }
 
   __prepareItems() {
-    return utils.objToArr(this.model.items.value, 'id', {toggle: this.__toggle, delete: this.__deleteItem})
+    return utils.objToArr(this.model.items.value, 'id', {
+        toggle: this.__toggle,
+        delete: this.__deleteItem,
+        onEdit: this.__editItem,
+        endEdit: this.__endEditItem
+      })
       .sort(this.__sortBy(this.model.orderBy.value))
       .filter(i => this.model.onlyDone.value ? i.done : i)
   }
@@ -98,7 +134,7 @@ utils.$('#add-task').addEventListener('submit', e => {
   if (task.value === '')
     return false
 
-  model.items.value[UID] = {task: task.value, done: false}
+  model.items.value[UID] = {task: task.value, done: false, isEditMode: false, isNotEditMode: true}
   model.nextUID.value = UID + 1;
   form.reset()
 })

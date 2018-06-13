@@ -62,11 +62,16 @@ class HyperTemplate {
       onmousedown: 'mousedown',
       onmouseup: 'mouseup',
       onclick: 'click',
-      onkeydown: 'keydown'
+      ondblclick: 'dblclick',
+      onkeydown: 'keydown',
+      onkeyup: 'keyup',
+      onfocusout: 'focusout',
+      onblur: 'blur'
     }
     this.VALUELESS_ATTRS = {
       checked: null,
-      selected: null
+      selected: null,
+      hidden: null
     }
     this.dom = dom
     this.data = []
@@ -82,21 +87,24 @@ class HyperTemplate {
             c[key] ? c[key].push(e) : c[key] = [e]
           }
         } else if (e.attributes) {
+          let attrsToDestroy = []
           for (let i = 0; i < e.attributes.length; i++) {
             let attr = e.attributes[i]
             let match = attr.textContent.match(/{{([^{}]+)}}/);
             if (match) {
               let key = match[1]
               if (attr.name in this.EVENTS) {
-                e.removeAttribute(attr.name)
+                // todo causes bug
+                attrsToDestroy.push(attr.name)
                 const evHandler = {nodeValue: () => {}}
-                e.addEventListener(this.EVENTS[attr.name], e => evHandler.nodeValue(e))
+                e.addEventListener(this.EVENTS[attr.name], e => evHandler.nodeValue(e), true)
                 c[key] ? c[key].push(evHandler) : c[key] = [evHandler]
               } else {
                 c[key] ? c[key].push(attr) : c[key] = [attr]
               }
             }
           }
+          attrsToDestroy.forEach(attrName => e.removeAttribute(attrName))
         }
         return c
       }, {})
@@ -125,6 +133,8 @@ class HyperTemplate {
   }
 
   __diff() {
+
+
 
   }
 

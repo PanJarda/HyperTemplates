@@ -10,7 +10,7 @@
     <h1>HyperTemplates TodoMVC</h1>
 
     <form id="add-task">
-      <input name="task">
+      <input name="task" autofocus>
       <input type="submit" value="+">
     </form>
 
@@ -18,7 +18,10 @@
       <template data-bind="items">
         <tr>
           <td><input type="checkbox" checked="{{done}}" data-key="{{id}}" onchange="{{toggle}}"></td>
-          <td>{{task}}</td>
+          <td>
+            <input type="text" value="{{task}}" data-key="{{id}}" hidden="{{isNotEditMode}}" onblur="{{endEdit}}" onkeyup="{{endEdit}}">
+            <span hidden="{{isEditMode}}" data-key="{{id}}" ondblclick="{{onEdit}}">{{task}}</span>
+          </td>
           <td><button data-key="{{id}}" onclick="{{delete}}">x</button></td>
         </tr>
       </template>
