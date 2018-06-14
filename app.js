@@ -96,7 +96,13 @@ class AppViewModel extends ViewModel {
   }
 
   __sortBy(key) {
-    return (a, b) => a[key] > b[key]
+    return (a, b) => {
+      return a[key] > b[key]
+              ? 1
+              : a[key] < b[key]
+                ? -1
+                : 0
+    }
   }
 
   update(key, val) {
