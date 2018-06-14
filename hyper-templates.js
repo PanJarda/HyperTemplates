@@ -105,7 +105,6 @@ class HyperTemplate {
             if (match) {
               let key = match[1]
               if (attr.name in this.EVENTS) {
-                // todo causes bug
                 attrsToDestroy.push(attr.name)
                 const evHandler = {nodeValue: () => {}}
                 e.addEventListener(this.EVENTS[attr.name], e => evHandler.nodeValue(e), true)
@@ -145,8 +144,6 @@ class HyperTemplate {
 
     const frag = document.createDocumentFragment()
 
-    //this.dom.parentNode.insertBefore(item['__DOMNode'], beforeNode);
-    //console.log(beforeNode)
     let i = 0,
       domNode = item['__DOMNode'],
       next = item['__DOMNode'].nextSibling
