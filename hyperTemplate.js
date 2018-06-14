@@ -20,7 +20,33 @@ class HyperTemplate {
       'data-hidden': 'hidden'
     }
     this.MACROS = {
-      'data-if': (el, val) => el.ownerElement.hidden = !val
+      'data-if': (el, val) => {
+        el.ownerElement.hidden = !val
+        el.nodeValue = val
+      },
+      // experimental
+      'data-for': (el, val) => {
+        const node = el.ownerElement
+        node.setAttribute('data-for-item', val.length - 1)
+        node.removeAttribute(el.name)
+        const parentNode = node.parentNode
+        
+        // TODO: cleanup
+        /*for (let i = 1; i < val.length; i++) {
+          parentNode.removeChild(node.nextSibling)
+        }*/
+
+        const frag = document.createDocumentFragment()
+        let clone = node.cloneNode()
+        node.textContent = val[val.length - 1]
+        for (let i = 0; i < val.length - 1; i++) {
+          clone.textContent = val[i]
+          clone.setAttribute('data-for-item', i)
+          frag.appendChild(clone)
+          clone = node.cloneNode()
+        }
+        parentNode.insertBefore(frag, node)
+      }
     }
     this.dom = dom
     this.data = []
@@ -195,12 +221,13 @@ class HyperTemplate {
   }
 
   __renderNode(node, val) {
+    if (node.name in this.MACROS) {
+      this.MACROS[node.name](node, val)
+      return
+    }
     if (node.nodeType === Node.ATTRIBUTE_NODE) {
       if (node.name in this.VALUELESS_ATTRS) {
         node.ownerElement[this.VALUELESS_ATTRS[node.name]] = val
-      }
-      if (node.name in this.MACROS) {
-        this.MACROS[node.name](node, val)
       }
     }
     node.nodeValue = val

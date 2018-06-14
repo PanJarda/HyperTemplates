@@ -17,7 +17,8 @@ class AppViewModel extends ViewModel {
           onlyDone: model.onlyDone.value,
           toggledAll: this.__toggledAll(),
           onToggleAll: this.__toggleAll,
-          onFilterDone: this.__filterDone
+          onFilterDone: this.__filterDone,
+          list: ['ahoj', 'jak', 'se', 'mas']
         }])
     }
 
