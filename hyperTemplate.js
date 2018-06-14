@@ -11,8 +11,7 @@ class HyperTemplate {
       ondblclick: 'dblclick',
       onkeydown: 'keydown',
       onkeyup: 'keyup',
-      onfocusout: 'focusout',
-      onblur: 'blur'
+      onfocusout: 'focusout'
     }
     this.VALUELESS_ATTRS = {
       'data-checked': 'checked',
@@ -25,6 +24,7 @@ class HyperTemplate {
     this.dom = dom
     this.data = []
     this.hash = []
+    this.tlength = 0
   }
 
   __walkNodes(dom, fn, context) {
@@ -82,7 +82,7 @@ class HyperTemplate {
               let key = match[1]
               if (attr.name in this.EVENTS) {
                 attrsToDestroy.push(attr.name)
-                const evHandler = {nodeValue: () => {}}
+                const evHandler = {nodeValue: e => {}}
                 e.addEventListener(this.EVENTS[attr.name], e => evHandler.nodeValue(e), true)
                 c[key] ? c[key].push(evHandler) : c[key] = [evHandler]
               } else {

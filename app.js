@@ -48,7 +48,7 @@ class AppViewModel extends ViewModel {
   __editItem(e) {
     const key = e.target.getAttribute('data-key')
     const items = this.model.items
-    items.value[key] = {...items.value[key], isEditMode: true, isNotEditMode: false}
+    items.value[key] = {...items.value[key], isEditMode: true}
   }
 
   __endEditItem(e) {
@@ -58,17 +58,17 @@ class AppViewModel extends ViewModel {
       switch(e.which) {
         case 27:
           this.edited = true
-          items.value[key] = {...items.value[key], isEditMode: false, isNotEditMode: true}
+          items.value[key] = {...items.value[key], isEditMode: false}
           break
         case 13:
           this.edited = true
-          items.value[key] = {...items.value[key], task: e.target.value, isEditMode: false, isNotEditMode: true}
+          items.value[key] = {...items.value[key], task: e.target.value, isEditMode: false}
           break
       }
       this.edited = false
     } else if (!this.edited) {
       this.edited = false
-      items.value[key] = {...items.value[key], task: e.target.value, isEditMode: false, isNotEditMode: true}
+      items.value[key] = {...items.value[key], task: e.target.value, isEditMode: false}
     }
   }
 
@@ -127,10 +127,10 @@ const model = createModel({
   orderBy: '_key',
   onlyDone: false,
   items: {
-    0: {task: 'D', done: false, isEditMode: false, isNotEditMode: true},
-    1: {task: 'C', done: false, isEditMode: false, isNotEditMode: true},
-    2: {task: 'B', done: false, isEditMode: false, isNotEditMode: true},
-    3: {task: 'A', done: false, isEditMode: false, isNotEditMode: true}
+    0: {task: 'D', done: false, isEditMode: false},
+    1: {task: 'C', done: false, isEditMode: false},
+    2: {task: 'B', done: false, isEditMode: false},
+    3: {task: 'A', done: false, isEditMode: false}
   }
 })
 
@@ -145,7 +145,7 @@ utils.$('#add-task').addEventListener('submit', e => {
   if (task.value === '')
     return false
 
-  model.items.value[UID] = {task: task.value, done: false, isEditMode: false, isNotEditMode: true}
+  model.items.value[UID] = {task: task.value, done: false, isEditMode: false}
   model.nextUID.value = UID + 1;
   form.reset()
 })
