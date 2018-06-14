@@ -19,7 +19,7 @@
         <tr>
           <td><input type="checkbox" data-checked="{{done}}" data-key="{{_key}}" onchange="{{toggle}}"></td>
           <td>
-            <input type="text" value="{{task}}" data-key="{{_key}}" data-hidden="{{isNotEditMode}}" onblur="{{endEdit}}" onkeyup="{{endEdit}}">
+            <input type="text" value="{{task}}" data-key="{{_key}}" data-if="{{isEditMode}}" onblur="{{endEdit}}" onkeyup="{{endEdit}}">
             <span data-hidden="{{isEditMode}}" data-key="{{_key}}" ondblclick="{{onEdit}}">{{task}}</span>
           </td>
           <td><button data-key="{{_key}}" onclick="{{delete}}">x</button></td>

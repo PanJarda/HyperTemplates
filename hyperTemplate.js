@@ -19,6 +19,9 @@ class HyperTemplate {
       'data-selected': 'selected',
       'data-hidden': 'hidden'
     }
+    this.MACROS = {
+      'data-if': (el, val) => el.hidden = !val
+    }
     this.dom = dom
     this.data = []
     this.hash = []
@@ -192,8 +195,13 @@ class HyperTemplate {
   }
 
   __renderNode(node, val) {
-    if (node.nodeType === Node.ATTRIBUTE_NODE && node.name in this.VALUELESS_ATTRS) {
+    if (node.nodeType === Node.ATTRIBUTE_NODE) {
+      if (node.name in this.VALUELESS_ATTRS) {
         node.ownerElement[this.VALUELESS_ATTRS[node.name]] = val
+      }
+      if (node.name in this.MACROS) {
+        this.MACROS[node.name](node.ownerElement, val)
+      }
     }
     node.nodeValue = val
   }
