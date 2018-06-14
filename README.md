@@ -87,7 +87,7 @@ Includes deep data diffing for absolutely minimal possible DOM changes.
   
 ## Todo
 
-[ ] macros (data-if, data-for)
-[ ] allow multiple texnodes: `<span>{{item}} - sometext</span>`
-[ ] conditional classnames: `<div class="{{done: 'done'}}">...`
+- [ ] macros (data-if, data-for)
+- [ ] allow multiple texnodes: `<span>{{item}} - sometext</span>`
+- [ ] conditional classnames: `<div class="{{done: 'done'}}">...`
 
