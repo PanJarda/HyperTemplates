@@ -1,0 +1,48 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.1/css/bootstrap-reboot.min.css" crossorigin="anonymous"/>
+    <link rel="stylesheet" href="custom.css"/>
+  </head>
+  <body>
+    <h1>HyperTemplates TodoMVC</h1>
+
+    <form id="add-task">
+      <input name="task" autofocus>
+      <input type="submit" value="+">
+    </form>
+
+    <table>
+      <template data-bind="items">
+        <tr>
+          <td><input type="checkbox" data-checked="{{done}}" data-key="{{_key}}" onchange="{{toggle}}"></td>
+          <td>
+            <input type="text" value="{{task}}" data-key="{{_key}}" data-if="{{isEditMode}}" onblur="{{endEdit}}" onkeyup="{{endEdit}}">
+            <span data-hidden="{{isEditMode}}" data-key="{{_key}}" ondblclick="{{onEdit}}">{{task}}</span>
+          </td>
+          <td><button data-key="{{_key}}" onclick="{{delete}}">x</button></td>
+        </tr>
+      </template>
+    </table>
+    <hr>
+    <template data-bind="flags">
+      <input type="checkbox" data-checked="{{onlyDone}}" id="toggle-done" onchange="{{onFilterDone}}">
+    </template>
+    <label for="toggle-done">Filter done</label><br>
+
+    <template data-bind="flags">
+      <input type="checkbox" id="toggle-all" data-checked="{{toggledAll}}" onchange="{{onToggleAll}}">
+    </template>
+    <label for="toggle-all">Toggle all</label><br>
+
+    <input type="checkbox" id="order-by-task">
+    <label for="order-by-task">Order by taskname</label>
+
+    <!-- scripts -->
+    <script src="../../hyperTemplate.js"></script>
+    <script src="lib.js"></script>
+    <script src="app.js"></script>
+  </body>
+</html>
