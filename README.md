@@ -1,6 +1,6 @@
 # HyperTemplates
 
-Super small (< 200 sloc, 2.243 kB gzipped) class for binding html5 native template tag to data array.
+Super small class for binding html5 native template tag to data array.
 
 No dependency.
 
