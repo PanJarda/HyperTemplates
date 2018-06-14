@@ -20,7 +20,7 @@ class HyperTemplate {
       'data-hidden': 'hidden'
     }
     this.MACROS = {
-      'data-if': (el, val) => el.hidden = !val
+      'data-if': (el, val) => el.ownerElement.hidden = !val
     }
     this.dom = dom
     this.data = []
@@ -200,7 +200,7 @@ class HyperTemplate {
         node.ownerElement[this.VALUELESS_ATTRS[node.name]] = val
       }
       if (node.name in this.MACROS) {
-        this.MACROS[node.name](node.ownerElement, val)
+        this.MACROS[node.name](node, val)
       }
     }
     node.nodeValue = val
