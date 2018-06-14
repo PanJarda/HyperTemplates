@@ -141,18 +141,23 @@ class HyperTemplate {
 
     const item = this.hash[oldPos],
       length = this.tlength
-    const beforeNode = newPos < (length - 1) ? this.hash[newPos]['__DOMNode'] : this.dom
+    const beforeNode = newPos === (this.hash.length - 1) ? this.dom : this.hash[newPos]['__DOMNode']
 
+    const frag = document.createDocumentFragment()
+
+    //this.dom.parentNode.insertBefore(item['__DOMNode'], beforeNode);
+    //console.log(beforeNode)
     let i = 0,
       domNode = item['__DOMNode'],
       next = item['__DOMNode'].nextSibling
-
     while (i < length) {
-      this.dom.parentNode.insertBefore(domNode, beforeNode)
+      frag.appendChild(domNode)
       domNode = next
       next = next.nextSibling
       i++
     }
+
+    this.dom.parentNode.insertBefore(frag, beforeNode)
 
     this.hash.splice(oldPos, 1)
     this.hash.splice(newPos, 0, item)
@@ -169,7 +174,7 @@ class HyperTemplate {
     }
   }
 
-  __diff(hash, left, right) {
+  __diff(left, right) {
     const leftMap = utils.hashmap(left, '_key'),
       rightMap = utils.hashmap(right, '_key')
 
@@ -179,7 +184,7 @@ class HyperTemplate {
         r = right[i]['_key']
       
       if (l === r) {
-        this.__innerDiff(hash[i], left[i], right[i])
+        this.__innerDiff(this.hash[i], left[i], right[i])
         i++
         continue
       }
@@ -191,13 +196,18 @@ class HyperTemplate {
       }
 
       if (r in leftMap) {
-        this.moveItemAt(leftMap[r], i)
-        this.__innerDiff(hash[i], left[i], right[i])
+        const oldPos = utils.hashmap(left, '_key')[r]
+        const item = left[oldPos]
+        //console.log(oldPos + ' -> ' + i)
+        this.__innerDiff(this.hash[oldPos], left[oldPos], right[i])
+        this.moveItemAt(oldPos, i)
+        left.splice(oldPos, 1)
+        left.splice(i, 0, item)
         i++
         continue
       }
 
-      this.__renderItem(i, right[i], hash[i]['__DOMNode'])
+      this.__renderItem(i, right[i], this.hash[i]['__DOMNode'])
       left.splice(i, 0, right[i])
       i++
     }
@@ -232,7 +242,9 @@ class HyperTemplate {
         this.__renderNode(node, data[key])
       })
     }
+
     this.hash.splice(i, 0, { ...hash, __DOMNode: frag.firstChild })
+
     if (!this.tlength)
       this.tlength = frag.childNodes.length
 
@@ -240,10 +252,10 @@ class HyperTemplate {
   }
 
   render(newData) {
-    this.__diff(this.hash, this.data, newData)
-
+    this.__diff(this.data, newData)
     this.data = [ ...newData ]
     return this
+
   }
 }
 

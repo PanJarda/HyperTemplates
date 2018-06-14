@@ -117,12 +117,14 @@ class AppViewModel extends ViewModel {
 }
 
 const model = createModel({
-  nextUID: 2,
-  orderBy: 'id',
+  nextUID: 4,
+  orderBy: '_key',
   onlyDone: false,
   items: {
-    0: {task: 'ahoj0', done: true, isEditMode: false, isNotEditMode: true},
-    1: {task: 'ahoj1', done: false, isEditMode: false, isNotEditMode: true}
+    0: {task: 'D', done: false, isEditMode: false, isNotEditMode: true},
+    1: {task: 'C', done: false, isEditMode: false, isNotEditMode: true},
+    2: {task: 'B', done: false, isEditMode: false, isNotEditMode: true},
+    3: {task: 'A', done: false, isEditMode: false, isNotEditMode: true}
   }
 })
 
@@ -140,4 +142,11 @@ utils.$('#add-task').addEventListener('submit', e => {
   model.items.value[UID] = {task: task.value, done: false, isEditMode: false, isNotEditMode: true}
   model.nextUID.value = UID + 1;
   form.reset()
+})
+
+utils.$('#order-by-task').addEventListener('change', e => {
+  console.log(e.target.checked)
+  e.target.checked
+  ? model.orderBy.value = 'task'
+  : model.orderBy.value = '_key'
 })
