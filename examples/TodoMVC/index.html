@@ -20,7 +20,7 @@
           <td><input type="checkbox" data-checked="{{done}}" data-key="{{_key}}" onchange="{{toggle}}"></td>
           <td>
             <input type="text" value="{{task}}" data-key="{{_key}}" data-if="{{isEditMode}}" onblur="{{endEdit}}" onkeyup="{{endEdit}}">
-            <span data-hidden="{{isEditMode}}" data-key="{{_key}}" ondblclick="{{onEdit}}">{{task}}</span>
+            <span data-class="crossed" data-class-if="{{done}}" data-hidden="{{isEditMode}}" data-key="{{_key}}" ondblclick="{{onEdit}}">{{task}}</span>
           </td>
           <td><button data-key="{{_key}}" onclick="{{delete}}">x</button></td>
         </tr>

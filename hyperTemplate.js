@@ -19,7 +19,14 @@ class HyperTemplate {
       'data-hidden': 'hidden'
     }
     this.MACROS = {
-      'data-if': (el, val) => el.ownerElement.hidden = !val
+      'data-if': (el, val) => el.ownerElement.hidden = !val,
+      'data-class-if': (el, val) => {
+        const node = el.ownerElement
+        const className = node.getAttribute('data-class')
+        if (!className)
+          return
+        val ? node.classList.add(className) : node.classList.remove(className)
+      }
     }
     this.dom = dom
     this.data = []

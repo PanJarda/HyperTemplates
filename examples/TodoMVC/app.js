@@ -96,13 +96,11 @@ class AppViewModel extends ViewModel {
   }
 
   __sortBy(key) {
-    return (a, b) => {
-      return a[key] > b[key]
+    return (a, b) => a[key] > b[key]
               ? 1
               : a[key] < b[key]
                 ? -1
                 : 0
-    }
   }
 
   update(key, val) {
@@ -127,10 +125,10 @@ const model = createModel({
   orderBy: '_key',
   onlyDone: false,
   items: {
-    0: {task: 'D', done: false, isEditMode: false},
-    1: {task: 'C', done: false, isEditMode: false},
-    2: {task: 'B', done: false, isEditMode: false},
-    3: {task: 'A', done: false, isEditMode: false}
+    0: {task: 'Help my landlady carry out garbage', done: false, isEditMode: false},
+    1: {task: 'Find the oracle', done: false, isEditMode: false},
+    2: {task: 'Visit the Architect', done: false, isEditMode: false},
+    3: {task: 'Bear the load', done: false, isEditMode: false}
   }
 })
 
@@ -151,7 +149,6 @@ utils.$('#add-task').addEventListener('submit', e => {
 })
 
 utils.$('#order-by-task').addEventListener('change', e => {
-  console.log(e.target.checked)
   e.target.checked
   ? model.orderBy.value = 'task'
   : model.orderBy.value = '_key'
