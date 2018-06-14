@@ -162,6 +162,7 @@ class HyperTemplate {
     for (let key in hash) {
       if (left[key] !== right[key]) {
         hash[key].forEach(node => {
+          //console.log('[~] ' + (node.name ? node.name : node) + ': ' + node.nodeValue + ' -> ' + right[key])
           this.__renderNode(node, right[key])
         })
       }
@@ -216,16 +217,9 @@ class HyperTemplate {
 
   __renderNode(node, val) {
     if (node.nodeType === Node.ATTRIBUTE_NODE && node.name in this.VALUELESS_ATTRS) {
-      if (val) {
-        node.nodeValue = val
-        node.ownerElement[this.VALUELESS_ATTRS[node.name]] = true
-      } else {
-        node.nodeValue = val
-        node.ownerElement[this.VALUELESS_ATTRS[node.name]] = false
-      }
-    } else {
-      node.nodeValue = val
+        node.ownerElement[this.VALUELESS_ATTRS[node.name]] = val
     }
+    node.nodeValue = val
   }
 
   __renderItem(i, data, insertBefore) {
@@ -247,14 +241,6 @@ class HyperTemplate {
 
   render(newData) {
     this.__diff(this.hash, this.data, newData)
-    
-    /*for (let i = 0; i < this.data.length; i++) {
-      this.deleteItem(0)
-    }*/
-
-    /*for (let i = 0; i < newData.length; i++) {
-      this.__renderItem(i, newData[i], this.dom)
-    }*/
 
     this.data = [ ...newData ]
     return this
