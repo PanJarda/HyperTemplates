@@ -68,7 +68,7 @@ Includes deep data diffing for absolutely minimal possible DOM changes.
 
   function toggle(e) {
     const key = e.target.getAttribute('data-key')
-    const task = todos.filter(task => task['_key'] == key)
+    const task = todos.filter(task => task['_key'] == key)[0]
     const index = todos.indexOf(task)
 
     todos[index].done = e.target.checked
@@ -82,7 +82,7 @@ Includes deep data diffing for absolutely minimal possible DOM changes.
       return
 
     todos.push({_key: todos.length, task: e.target.newTask.value, done: false, toggle: toggle})
-    
+
     e.target.reset()
     hyperTmpl.render(todos)
   })
