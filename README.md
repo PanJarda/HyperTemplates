@@ -78,6 +78,7 @@ Includes deep data diffing for absolutely minimal possible DOM changes.
   addTask.addEventListener('submit', e => {
     e.preventDefault()
     todos.push({_key: todos.length, task: e.target.newTask.value, done: false, toggle: toggle})
+    e.target.reset()
     hyperTmpl.render(todos)
   })
 </script>
