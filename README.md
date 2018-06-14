@@ -85,5 +85,7 @@ Includes deep data diffing for absolutely minimal possible DOM changes.
 ```
 [codepen](https://codepen.io/anon/pen/GGvOzW)
   
+## Todo
 
+[ ] add macros (data-if, data-for)
 
