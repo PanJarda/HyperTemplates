@@ -85,7 +85,7 @@ class AppViewModel extends ViewModel {
   }
 
   __prepareItems() {
-    return utils.objToArr(this.model.items.value, 'id', {
+    return utils.objToArr(this.model.items.value, '_key', {
         toggle: this.__toggle,
         delete: this.__deleteItem,
         onEdit: this.__editItem,
@@ -117,10 +117,13 @@ class AppViewModel extends ViewModel {
 }
 
 const model = createModel({
-  nextUID: 0,
+  nextUID: 2,
   orderBy: 'id',
   onlyDone: false,
-  items: {}
+  items: {
+    0: {task: 'ahoj0', done: true, isEditMode: false, isNotEditMode: true},
+    1: {task: 'ahoj1', done: false, isEditMode: false, isNotEditMode: true}
+  }
 })
 
 const viewModel = new AppViewModel(model)

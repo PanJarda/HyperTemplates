@@ -17,23 +17,23 @@
     <table>
       <template data-bind="items">
         <tr>
-          <td><input type="checkbox" checked="{{done}}" data-key="{{id}}" onchange="{{toggle}}"></td>
+          <td><input type="checkbox" data-checked="{{done}}" data-key="{{_key}}" onchange="{{toggle}}"></td>
           <td>
-            <input type="text" value="{{task}}" data-key="{{id}}" hidden="{{isNotEditMode}}" onblur="{{endEdit}}" onkeyup="{{endEdit}}">
-            <span hidden="{{isEditMode}}" data-key="{{id}}" ondblclick="{{onEdit}}">{{task}}</span>
+            <input type="text" value="{{task}}" data-key="{{_key}}" data-hidden="{{isNotEditMode}}" onblur="{{endEdit}}" onkeyup="{{endEdit}}">
+            <span data-hidden="{{isEditMode}}" data-key="{{_key}}" ondblclick="{{onEdit}}">{{task}}</span>
           </td>
-          <td><button data-key="{{id}}" onclick="{{delete}}">x</button></td>
+          <td><button data-key="{{_key}}" onclick="{{delete}}">x</button></td>
         </tr>
       </template>
     </table>
-
+    <hr>
     <template data-bind="flags">
-      <input type="checkbox" checked="{{onlyDone}}" id="toggle-done" onchange="{{onFilterDone}}">
+      <input type="checkbox" data-checked="{{onlyDone}}" id="toggle-done" onchange="{{onFilterDone}}">
     </template>
     <label for="toggle-done">Filter done</label><br>
 
     <template data-bind="flags">
-      <input type="checkbox" id="toggle-all" checked="{{toggledAll}}" onchange="{{onToggleAll}}">
+      <input type="checkbox" id="toggle-all" data-checked="{{toggledAll}}" onchange="{{onToggleAll}}">
     </template>
     <label for="toggle-all">Toggle all</label>
 

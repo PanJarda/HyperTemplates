@@ -49,6 +49,17 @@ const utils = {
       res.push({[keyAs]: key, ...obj[key], ...extend})
     })
     return res
+  },
+
+  hashmap(arr, key) {
+    const l = arr.length
+    const hashmap = {}
+    
+    for (let i = 0; i < l; i++) {
+      hashmap[arr[i][key]] = i
+    }
+
+    return hashmap
   }
 }
 
@@ -69,9 +80,9 @@ class HyperTemplate {
       onblur: 'blur'
     }
     this.VALUELESS_ATTRS = {
-      checked: null,
-      selected: null,
-      hidden: null
+      'data-checked': 'checked',
+      'data-selected': 'selected',
+      'data-hidden': 'hidden'
     }
     this.dom = dom
     this.data = []
@@ -128,14 +139,93 @@ class HyperTemplate {
     if (newPos < 0 || newPos >= this.hash.length)
       return
 
-    const item = this.hash[oldPos]
+    const item = this.hash[oldPos],
+      length = this.tlength
+    const beforeNode = newPos < (length - 1) ? this.hash[newPos]['__DOMNode'] : this.dom
 
+    let i = 0,
+      domNode = item['__DOMNode'],
+      next = item['__DOMNode'].nextSibling
+
+    while (i < length) {
+      this.dom.parentNode.insertBefore(domNode, beforeNode)
+      domNode = next
+      next = next.nextSibling
+      i++
+    }
+
+    this.hash.splice(oldPos, 1)
+    this.hash.splice(newPos, 0, item)
   }
 
-  __diff() {
+  __innerDiff(hash, left, right) {
+    for (let key in hash) {
+      if (left[key] !== right[key]) {
+        hash[key].forEach(node => {
+          this.__renderNode(node, right[key])
+        })
+      }
+    }
+  }
 
+  __diff(hash, left, right) {
+    const leftMap = utils.hashmap(left, '_key'),
+      rightMap = utils.hashmap(right, '_key')
 
+    let i = 0
+    while (i < left.length && i < right.length) {
+      let l = left[i]['_key'],
+        r = right[i]['_key']
+      
+      if (l === r) {
+        this.__innerDiff(hash[i], left[i], right[i])
+        i++
+        continue
+      }
+      
+      if (!(l in rightMap)) {
+        left.splice(i, 1)
+        this.deleteItem(i)
+        continue
+      }
 
+      if (r in leftMap) {
+        this.moveItemAt(leftMap[r], i)
+        this.__innerDiff(hash[i], left[i], right[i])
+        i++
+        continue
+      }
+
+      this.__renderItem(i, right[i], hash[i]['__DOMNode'])
+      left.splice(i, 0, right[i])
+      i++
+    }
+
+    let j = i
+    while (j < left.length) {
+      this.deleteItem(i)
+      j++
+    }
+
+    while (i < right.length) {
+      this.__renderItem(i, right[i], this.dom)
+      left.push(right[i])
+      i++
+    }
+  }
+
+  __renderNode(node, val) {
+    if (node.nodeType === Node.ATTRIBUTE_NODE && node.name in this.VALUELESS_ATTRS) {
+      if (val) {
+        node.nodeValue = val
+        node.ownerElement[this.VALUELESS_ATTRS[node.name]] = true
+      } else {
+        node.nodeValue = val
+        node.ownerElement[this.VALUELESS_ATTRS[node.name]] = false
+      }
+    } else {
+      node.nodeValue = val
+    }
   }
 
   __renderItem(i, data, insertBefore) {
@@ -145,11 +235,7 @@ class HyperTemplate {
 
     for (let key in hash) {
       hash[key].forEach(node => {
-        if (node.nodeType === Node.ATTRIBUTE_NODE && node.name in this.VALUELESS_ATTRS) {
-          data[key] ? node.nodeValue = data[key] : node.ownerElement.removeAttribute(node.name)
-        } else {
-          node.nodeValue = data[key]
-        }
+        this.__renderNode(node, data[key])
       })
     }
     this.hash.splice(i, 0, { ...hash, __DOMNode: frag.firstChild })
@@ -160,17 +246,16 @@ class HyperTemplate {
   }
 
   render(newData) {
-    if (!newData) {
-      newData = this.dataPtr
-    }
-    for (let i = 0; i < this.data.length; i++) {
+    this.__diff(this.hash, this.data, newData)
+    
+    /*for (let i = 0; i < this.data.length; i++) {
       this.deleteItem(0)
-    }
+    }*/
 
-    for (let i = 0; i < newData.length; i++) {
+    /*for (let i = 0; i < newData.length; i++) {
       this.__renderItem(i, newData[i], this.dom)
-    }
-    this.dataPtr = newData
+    }*/
+
     this.data = [ ...newData ]
     return this
   }
