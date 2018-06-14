@@ -142,19 +142,15 @@ class HyperTemplate {
       length = this.tlength
     const beforeNode = newPos === (this.hash.length - 1) ? this.dom : this.hash[newPos]['__DOMNode']
 
-    const frag = document.createDocumentFragment()
-
     let i = 0,
       domNode = item['__DOMNode'],
       next = item['__DOMNode'].nextSibling
     while (i < length) {
-      frag.appendChild(domNode)
+      this.dom.parentNode.insertBefore(domNode, beforeNode)
       domNode = next
       next = next.nextSibling
       i++
     }
-
-    this.dom.parentNode.insertBefore(frag, beforeNode)
 
     this.hash.splice(oldPos, 1)
     this.hash.splice(newPos, 0, item)
