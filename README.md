@@ -38,6 +38,12 @@ Includes deep data diffing for absolutely minimal possible DOM changes.
 ## Advanced example
 
 ```html
+<style>
+  .crossed {
+    text-decoration: line-through;
+  }
+</style>
+
 <h1>TODO</h1>
 
 <form id="add-task">
@@ -49,7 +55,7 @@ Includes deep data diffing for absolutely minimal possible DOM changes.
   <template id="todos">
     <tr>
       <td><input type="checkbox" data-checked="{{done}}" onchange="{{toggle}}" data-key="{{_key}}"></td>
-      <td>{{task}}</td>
+      <td data-class="crossed" data-class-if="{{done}}">{{task}}</td>
     </tr>
   </template>
 </table>
@@ -71,7 +77,7 @@ Includes deep data diffing for absolutely minimal possible DOM changes.
     const task = todos.filter(task => task['_key'] == key)[0]
     const index = todos.indexOf(task)
 
-    todos[index].done = e.target.checked
+    todos[index] = { ...task, done: e.target.checked}
     hyperTmpl.render(todos)
   }
 
@@ -92,8 +98,6 @@ Includes deep data diffing for absolutely minimal possible DOM changes.
   
 ## Todo
 
-- [ ] macros (data-if, data-for)
 - [ ] allow multiple texnodes: `<span>{{item}} - sometext</span>`
-- [ ] conditional classnames: `<div class="{{done: 'done'}}">...`
 - [ ] allow plugins?
 
